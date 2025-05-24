@@ -59,6 +59,10 @@ try {
                         <p><?php echo htmlspecialchars($video['artist']); ?></p>
                         <p class="duration"><?php echo $duration; ?></p>
                         <button class="copy-command-btn" data-youtube-link="https://youtu.be/<?php echo htmlspecialchars($video['video_id']); ?>">Copy Song Request Command</button>
+                        <div class="button-container">
+                            <button class="edit-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>">Edit</button>
+                            <button class="refresh-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>"><span class="refresh-icon">↻</span></button>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>

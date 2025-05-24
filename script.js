@@ -39,4 +39,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Edit button functionality
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const videoId = button.getAttribute('data-video-id');
+            window.location.href = `edit_video.php?video_id=${videoId}`;
+        });
+    });
+
+    // Refresh button functionality
+    const refreshButtons = document.querySelectorAll('.refresh-btn');
+    refreshButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const videoId = button.getAttribute('data-video-id');
+            if (confirm('Are you sure you want to refresh the video metadata from YouTube? This will overwrite existing data!')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'refresh_video.php';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'video_id';
+                input.value = videoId;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
 });
