@@ -526,6 +526,46 @@ body {
     margin: 2rem 0;
 }
 
+/* Artist list for artists.php */
+.artist-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 0;
+    list-style: none;
+}
+
+.artist-list li {
+    margin-bottom: 0.5rem;
+}
+
+.artist-list a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.artist-list a:hover {
+    color: var(--text-color);
+}
+
+/* Back link for artists.php */
+.back-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--text-color);
+}
+
 @media (max-width: 768px) {
     .titlebar {
         flex-direction: column;
@@ -590,5 +630,9 @@ body {
     .pagination-link {
         padding: 0.4rem 0.8rem;
         font-size: 0.9rem;
+    }
+
+    .artist-list {
+        grid-template-columns: 1fr;
     }
 }

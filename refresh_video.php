@@ -23,7 +23,7 @@ $dsn = "pgsql:host=$host;dbname=$db;sslmode=$sslmode";
 
 // Determine the referring page and query parameters for redirect
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
-$valid_pages = ['originals.php', 'covers.php', 'loops.php', 'uke-vocals.php', 'all-songs.php', 'newest-additions.php'];
+$valid_pages = ['originals.php', 'covers.php', 'loops.php', 'uke-vocals.php', 'all-songs.php', 'newest-additions.php', 'artists.php'];
 $redirect_page = 'originals.php';
 $redirect_params = [];
 
@@ -32,9 +32,12 @@ if ($referer) {
     $path = basename($parsed_url['path'] ?? '');
     if (in_array($path, $valid_pages)) {
         $redirect_page = $path;
-        // Preserve query parameters if all-songs.php
-        if ($path === 'all-songs.php' && !empty($parsed_url['query'])) {
+        // Preserve query parameters for all-songs.php or artists.php
+        if (in_array($path, ['all-songs.php', 'artists.php']) && !empty($parsed_url['query'])) {
             parse_str($parsed_url['query'], $query_params);
+            if (isset($query_params['artist'])) {
+                $redirect_params['artist'] = $query_params['artist'];
+            }
             if (isset($query_params['search'])) {
                 $redirect_params['search'] = $query_params['search'];
             }
