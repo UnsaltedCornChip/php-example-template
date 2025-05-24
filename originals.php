@@ -25,6 +25,16 @@ try {
 } catch (PDOException $e) {
     $error = "Database error: " . $e->getMessage();
 }
+
+// Check for success/error messages in query string
+$message = '';
+if (isset($_GET['status'])) {
+    if ($_GET['status'] === 'success') {
+        $message = $_GET['message'] ?? 'Video metadata refreshed successfully!';
+    } elseif ($_GET['status'] === 'error') {
+        $message = isset($_GET['message']) ? htmlspecialchars($_GET['message']) : 'An error occurred.';
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +50,9 @@ try {
     <?php include 'includes/header.php'; ?>
     <main class="main-content">
         <h2>TVC Originals</h2>
+        <?php if ($message): ?>
+            <p class="form-message"><?php echo htmlspecialchars($message); ?></p>
+        <?php endif; ?>
         <?php if (isset($error)): ?>
             <p class="no-videos"><?php echo htmlspecialchars($error); ?></p>
         <?php elseif (empty($videos)): ?>

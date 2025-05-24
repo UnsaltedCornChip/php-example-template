@@ -21,6 +21,18 @@ $pass = getenv('DB_PASS');
 $sslmode = 'require';
 $dsn = "pgsql:host=$host;dbname=$db;sslmode=$sslmode";
 
+// Determine the referring page for redirect
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+$valid_pages = ['originals.php', 'covers.php', 'loops.php', 'uke-vocals.php'];
+$redirect_page = 'originals.php'; // Fallback
+if ($referer) {
+    $parsed_url = parse_url($referer);
+    $path = basename($parsed_url['path'] ?? '');
+    if (in_array($path, $valid_pages)) {
+        $redirect_page = $path;
+    }
+}
+
 try {
     $pdo = new PDO("$dsn", "$user", "$pass");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -48,11 +60,11 @@ try {
         }
 
         if (empty($data['items'])) {
-            header("Location: originals.php?status=error&message=" . urlencode("Video not found."));
+            header("Location: $redirect_page?status=error&message=" . urlencode("Video not found."));
             exit;
         }
     } catch (Exception $e) {
-        header("Location: originals.php?status=error&message=" . urlencode("Error fetching video data: " . $e->getMessage()));
+        header("Location: $redirect_page?status=error&message=" . urlencode("Error fetching video data: " . $e->getMessage()));
         exit;
     }
 
@@ -84,14 +96,14 @@ try {
         ':video_id' => $videoId
     ]);
 
-    header("Location: originals.php?status=success&message=" . urlencode("Video metadata refreshed successfully!"));
+    header("Location: $redirect_page?status=success&message=" . urlencode("Video metadata refreshed successfully!"));
     exit;
 
 } catch (PDOException $e) {
-    header("Location: originals.php?status=error&message=" . urlencode("Database error: " . $e->getMessage()));
+    header("Location: $redirect_page?status=error&message=" . urlencode("Database error: " . $e->getMessage()));
     exit;
 } catch (Exception $e) {
-    header("Location: originals.php?status=error&message=" . urlencode("Unexpected error: " . $e->getMessage()));
+    header("Location: $redirect_page?status=error&message=" . urlencode("Unexpected error: " . $e->getMessage()));
     exit;
 }
 ?>
