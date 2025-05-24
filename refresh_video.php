@@ -25,7 +25,7 @@ $dsn = "pgsql:host=$host;dbname=$db;sslmode=$sslmode";
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 $valid_pages = ['originals.php', 'covers.php', 'loops.php', 'uke-vocals.php', 'all-songs.php'];
 $redirect_page = 'originals.php';
-$redirect_params = '';
+$redirect_params = [];
 
 if ($referer) {
     $parsed_url = parse_url($referer);
@@ -35,18 +35,14 @@ if ($referer) {
         // Preserve query parameters if all-songs.php
         if ($path === 'all-songs.php' && !empty($parsed_url['query'])) {
             parse_str($parsed_url['query'], $query_params);
-            $params_to_keep = [];
             if (isset($query_params['search'])) {
-                $params_to_keep['search'] = $query_params['search'];
+                $redirect_params['search'] = $query_params['search'];
             }
             if (isset($query_params['page'])) {
-                $params_to_keep['page'] = $query_params['page'];
+                $redirect_params['page'] = $query_params['page'];
             }
             if (isset($query_params['per_page'])) {
-                $params_to_keep['per_page'] = $query_params['per_page'];
-            }
-            if (!empty($params_to_keep)) {
-                $redirect_params = '?' . http_build_query($params_to_keep);
+                $redirect_params['per_page'] = $query_params['per_page'];
             }
         }
     }
@@ -79,11 +75,15 @@ try {
         }
 
         if (empty($data['items'])) {
-            header("Location: $redirect_page$redirect_params?status=error&message=" . urlencode("Video not found."));
+            $redirect_params['status'] = 'error';
+            $redirect_params['message'] = 'Video not found.';
+            header("Location: $redirect_page?" . http_build_query($redirect_params));
             exit;
         }
     } catch (Exception $e) {
-        header("Location: $redirect_page$redirect_params?status=error&message=" . urlencode("Error fetching video data: " . $e->getMessage()));
+        $redirect_params['status'] = 'error';
+        $redirect_params['message'] = 'Error fetching video data: ' . $e->getMessage();
+        header("Location: $redirect_page?" . http_build_query($redirect_params));
         exit;
     }
 
@@ -115,14 +115,21 @@ try {
         ':video_id' => $videoId
     ]);
 
-    header("Location: $redirect_page$redirect_params?status=success&message=" . urlencode("Video metadata refreshed successfully!"));
+    // Add success message to redirect
+    $redirect_params['status'] = 'success';
+    $redirect_params['message'] = 'Video metadata refreshed successfully!';
+    header("Location: $redirect_page?" . http_build_query($redirect_params));
     exit;
 
 } catch (PDOException $e) {
-    header("Location: $redirect_page$redirect_params?status=error&message=" . urlencode("Database error: " . $e->getMessage()));
+    $redirect_params['status'] = 'error';
+    $redirect_params['message'] = 'Database error: ' . $e->getMessage();
+    header("Location: $redirect_page?" . http_build_query($redirect_params));
     exit;
 } catch (Exception $e) {
-    header("Location: $redirect_page$redirect_params?status=error&message=" . urlencode("Unexpected error: " . $e->getMessage()));
+    $redirect_params['status'] = 'error';
+    $redirect_params['message'] = 'Unexpected error: ' . $e->getMessage();
+    header("Location: $redirect_page?" . http_build_query($redirect_params));
     exit;
 }
 ?>

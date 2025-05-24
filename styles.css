@@ -334,9 +334,20 @@ body {
 
 .form-message {
     font-size: 1.1rem;
-    color: var(--accent-color);
-    margin-bottom: 1rem;
+    margin: 1rem 0;
+    padding: 0.5rem;
     text-align: center;
+    border-radius: 4px;
+}
+
+.success-message {
+    color: #28a745;
+    background-color: #e6ffe6;
+}
+
+.error-message {
+    color: #dc3545;
+    background-color: #ffe6e6;
 }
 
 /* Video list styles for originals.php, loops.php, etc. */

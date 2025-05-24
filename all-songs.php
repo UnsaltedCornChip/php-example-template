@@ -16,6 +16,15 @@ try {
     $page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $per_page = isset($_GET['per_page']) && in_array($_GET['per_page'], ['10', '25', '50', '100']) ? (int)$_GET['per_page'] : 25;
 
+    // Check for success/error messages
+    $message = '';
+    $message_type = '';
+    if (isset($_GET['status'])) {
+        $message_type = $_GET['status'] === 'success' ? 'success' : 'error';
+        $message = $_GET['message'] ?? ($message_type === 'success' ? 'Video metadata refreshed successfully!' : 'An error occurred.');
+        $message = htmlspecialchars($message);
+    }
+
     // Build the query
     $query = "SELECT video_id, title, artist, length_seconds, thumbnail_link 
               FROM youtube_videos 
@@ -31,7 +40,7 @@ try {
     
     // Get total count for pagination
     $count_query = str_replace('video_id, title, artist, length_seconds, thumbnail_link', 'COUNT(*)', $query);
-    $count_query = str_replace(' ORDER BY title', '', $count_query); // Remove ORDER BY for count
+    $count_query = str_replace(' ORDER BY title', '', $count_query);
     $count_stmt = $pdo->prepare($count_query);
     foreach ($params as $key => $value) {
         $count_stmt->bindValue($key, $value);
@@ -52,16 +61,6 @@ try {
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
     $videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Check for messages
-    $message = '';
-    if (isset($_GET['status'])) {
-        if ($_GET['status'] === 'success') {
-            $message = $_GET['message'] ?? 'Video metadata refreshed successfully!';
-        } elseif ($_GET['status'] === 'error') {
-            $message = isset($_GET['message']) ? htmlspecialchars($_GET['message']) : 'An error occurred.';
-        }
-    }
 } catch (PDOException $e) {
     $error = "Database error: " . $e->getMessage();
     $videos = [];
@@ -77,6 +76,7 @@ try {
                              LIMIT 10");
         $videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $message = "Fallback query used due to error in main query.";
+        $message_type = 'error';
     } catch (PDOException $e) {
         $error .= " | Fallback query failed: " . $e->getMessage();
     }
@@ -113,7 +113,9 @@ try {
                 <button type="submit" class="form-button">Search</button>
             </form>
             <?php if ($message): ?>
-                <p class="form-message"><?php echo htmlspecialchars($message); ?></p>
+                <p class="form-message <?php echo $message_type === 'success' ? 'success-message' : 'error-message'; ?>">
+                    <?php echo $message; ?>
+                </p>
             <?php endif; ?>
             <?php if (isset($error)): ?>
                 <p class="no-videos"><?php echo htmlspecialchars($error); ?></p>
