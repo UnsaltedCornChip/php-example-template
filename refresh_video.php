@@ -23,7 +23,7 @@ $dsn = "pgsql:host=$host;dbname=$db;sslmode=$sslmode";
 
 // Determine the referring page and query parameters for redirect
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
-$valid_pages = ['originals.php', 'covers.php', 'loops.php', 'uke-vocals.php', 'all-songs.php'];
+$valid_pages = ['originals.php', 'covers.php', 'loops.php', 'uke-vocals.php', 'all-songs.php', 'newest-additions.php'];
 $redirect_page = 'originals.php';
 $redirect_params = [];
 
