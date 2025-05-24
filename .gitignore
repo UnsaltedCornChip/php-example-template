@@ -1,3 +1,4 @@
 .env
 .azure/
+test/
 commands_i_ran
