@@ -400,6 +400,11 @@ body {
     margin-bottom: 0.25rem;
 }
 
+.video-item p.categories {
+    font-size: 0.9rem;
+    color: var(--content-secondary-text);
+}
+
 .video-item p.duration {
     font-size: 0.9rem;
     color: var(--accent-color);
@@ -512,6 +517,10 @@ body {
 }
 
 .light-mode .video-item p {
+    color: #656565;
+}
+
+.light-mode .video-item p.categories {
     color: #656565;
 }
 
