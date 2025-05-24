@@ -1,0 +1,113 @@
+https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=jnwBwJ3c_SE&key=AIzaSyB1M-pxNdAhVUfjo8PEfWWZ70rhdjEEYqU
+
+
+CREATE TABLE youtube_videos (
+    id SERIAL PRIMARY KEY,
+    video_id TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    artist TEXT NOT NULL,
+    thumbnail_link TEXT NOT NULL, 
+    length_seconds INTEGER NOT NULL
+);
+
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE video_categories (
+    id SERIAL PRIMARY KEY,
+    video_id TEXT NOT NULL REFERENCES youtube_videos(video_id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    UNIQUE(video_id, category_id)
+);
+
+INSERT INTO categories (name) VALUES
+('Acoustic'),
+('Alternative'),
+('Ballad'),
+('Bounce'),
+('Breaks'),
+('Celtic'),
+('Chill'),
+('Chillout'),
+('Chillstep'),
+('DnB/Drumstep'),
+('Drum & Bass'),
+('Drumstep'),
+('Dubstep'),
+('EDM'),
+('Electro House'),
+('Electro Swing'),
+('Electronic'),
+('Female Vocalist'),
+('Future Bass'),
+('Future Rock'),
+('Game Music'),
+('Gaming: Horror'),
+('Glitch Hop / 110BPM'),
+('Glitch Hop'),
+('Halftime'),
+('Happy Hardcore'),
+('Hard Dance'),
+('Hardcore'),
+('Hip Hop'),
+('House'),
+('Indie Dance'),
+('Indie Lo-Fi'),
+('Indie Synthwave'),
+('Indie'),
+('Lo-Fi'),
+('Meme/Humor'),
+('Metal'),
+('Minimal/Trance'),
+('Monstercat'),
+('Moombahton'),
+('Movie Titles'),
+('Nu Disco'),
+('Orchestral'),
+('Pop Punk'),
+('Pop'),
+('Progressive House'),
+('Psy-Trance'),
+('Rock'),
+('Seasonal/Holiday'),
+('Singer-Songwriter'),
+('Space Jams'),
+('Symphonic Metal'),
+('Synthwave'),
+('TVC Cover Songs'),
+('TVC Loops'),
+('TVC Originals'),
+('TVC Uke & Vocals'),
+('Techno'),
+('Trance'),
+('Trap'),
+('Tropical House'),
+('Violin'),
+('Visualizer'),
+('Workout');
+
+
+
+-------------------------------------------------
+yes, lets do some of your suggestions:
+
+- The commented // redirect to db entry page suggests a need for a redirect to a confirmation page or back to a form.
+- Add try-catch for API and database errors.
+- Check if video_id already exists to avoid duplicates (though UNIQUE constraint exists, a user-friendly message would help).
+- The categories and video_categories tables suggest videos should be categorized, but this script doesn’t handle it. A form could allow selecting categories to insert into video_categories.  The selection of categories at this point should be optional.  if the user wants to categorize the video, they should be able to do that later as well.
+- Add a created_at timestamp to youtube_videos for sorting by addition date (useful for newest-additions.php).
+- Consider a status column (e.g., “active”, “inactive”) to control which videos appear on the site.
+- Index video_id and category_id in video_categories for faster joins.
+
+
+
+-- Add created_at and status columns to youtube_videos
+ALTER TABLE youtube_videos
+    ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive'));
+
+-- Create indexes on video_categories for faster joins
+CREATE INDEX idx_video_categories_video_id ON video_categories (video_id);
+CREATE INDEX idx_video_categories_category_id ON video_categories (category_id);

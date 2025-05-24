@@ -1,0 +1,70 @@
+HTTP Code: 0
+Response: 
+Error: SSL certificate problem: unable to get local issuer certificate
+HTTP Code: 200
+Response: {
+  "kind": "youtube#videoListResponse",
+  "etag": "cVJuFDOsoWShYQNifM2Ely8cVqM",
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "XXaYYJR457NUsJFXaXK1AGcMvK0",
+      "id": "tLNpNkFTTyg",
+      "snippet": {
+        "publishedAt": "2017-03-26T15:19:57Z",
+        "channelId": "UChiyLQjQLY4-mYwlGv42uFw",
+        "title": "Clean Bandit - Symphony (feat. Zara Larsson) [Official Instrumental] +DL",
+        "description": "DL: https://drive.google.com/file/d/0BwmugcJhqEYccG1LM09jRFA3X1k/view\n\r\n\r-Video Upload powered by https://www.TunesToTube.com",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/tLNpNkFTTyg/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/tLNpNkFTTyg/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/tLNpNkFTTyg/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/tLNpNkFTTyg/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/tLNpNkFTTyg/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "channelTitle": "Ruda Minařík",
+        "categoryId": "10",
+        "liveBroadcastContent": "none",
+        "localized": {
+          "title": "Clean Bandit - Symphony (feat. Zara Larsson) [Official Instrumental] +DL",
+          "description": "DL: https://drive.google.com/file/d/0BwmugcJhqEYccG1LM09jRFA3X1k/view\n\r\n\r-Video Upload powered by https://www.TunesToTube.com"
+        }
+      },
+      "contentDetails": {
+        "duration": "PT3M40S",
+        "dimension": "2d",
+        "definition": "hd",
+        "caption": "false",
+        "licensedContent": false,
+        "contentRating": {},
+        "projection": "rectangular"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 1,
+    "resultsPerPage": 1
+  }
+}
+
+Error: 
