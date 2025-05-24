@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Failed to copy command. Please copy manually: ' + command);
                 });
             } else {
-                // Fallback for non-secure contexts or unsupported browsers
                 alert('Copy this command manually: ' + command);
             }
         });
@@ -68,4 +67,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Persist results per page in localStorage
+    const perPageSelect = document.querySelector('#per_page');
+    if (perPageSelect) {
+        // Set initial value from localStorage or default to 25
+        const savedPerPage = localStorage.getItem('resultsPerPage') || '25';
+        perPageSelect.value = savedPerPage;
+
+        // Update localStorage when selection changes
+        perPageSelect.addEventListener('change', () => {
+            localStorage.setItem('resultsPerPage', perPageSelect.value);
+        });
+    }
 });

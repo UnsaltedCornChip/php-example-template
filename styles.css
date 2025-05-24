@@ -461,6 +461,35 @@ body {
     font-size: 1rem;
 }
 
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.pagination-link {
+    background-color: var(--secondary-bg);
+    color: var(--content-text);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-link:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+.pagination-link.active {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    cursor: default;
+}
+
 /* Light mode text color overrides for video-item */
 .light-mode .video-item h4,
 .light-mode .video-item h4 a {
@@ -540,5 +569,15 @@ body {
 
     .button-container {
         gap: 0.3rem;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .pagination-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
     }
 }
