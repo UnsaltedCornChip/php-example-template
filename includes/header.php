@@ -20,6 +20,7 @@
             <li><a href="all-songs.php">All Songs</a></li>
             <li><a href="newest-additions.php">Newest Additions</a></li>
             <li><a href="artists.php">Artists</a></li>
+            <li><a href="random.php">Random</a></li>
             <li class="dropdown">
                 <a href="#" class="dropbtn">Admin</a>
                 <div class="dropdown-content">
