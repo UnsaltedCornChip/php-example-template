@@ -70,10 +70,11 @@ try {
                     $category_map = array_combine($video_ids, array_column($batch, 'category_id'));
 
                     // Validate category_ids
-                    foreach ($category_map as $category_id) {
+                    foreach ($category_map as $video_id => $category_id) {
                         if (!in_array($category_id, $valid_category_ids)) {
-                            $errors++;
-                            continue;
+                            $skipped++;
+                            $progress[] = "Skipped video_id: $video_id (invalid category_id: $category_id)";
+                            unset($category_map[$video_id]);
                         }
                     }
 
@@ -82,7 +83,7 @@ try {
                     for ($j = 0; $j < count($video_ids); $j += $api_batch_size) {
                         $batch_ids = array_slice($video_ids, $j, $api_batch_size);
                         $ids_string = implode(',', $batch_ids);
-                        $apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id={$ids_string}&key={$apiKey}";
+                        $apiUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${ids_string}&key=${apiKey}";
 
                         try {
                             $ch = curl_init();
@@ -97,24 +98,33 @@ try {
                             curl_close($ch);
 
                             if ($response === false || $httpCode !== 200) {
-                                $progress[] = "API error for batch " . ($i + $j) . ": HTTP $httpCode, $curlError";
+                                $progress[] = "API error for batch " . ($i / $batch_size + 1) . ": HTTP $httpCode, $curlError";
                                 $errors += count($batch_ids);
                                 continue;
                             }
 
                             $data = json_decode($response, true);
                             if (json_last_error() !== JSON_ERROR_NONE) {
-                                $progress[] = "Invalid JSON for batch " . ($i + $j) . ": " . json_last_error_msg();
+                                $progress[] = "Invalid JSON for batch " . ($i / $batch_size + 1) . ": " . json_last_error_msg();
                                 $errors += count($batch_ids);
                                 continue;
+                            }
+
+                            // Check for unavailable videos
+                            $returned_ids = array_column($data['items'], 'id');
+                            $missing_ids = array_diff($batch_ids, $returned_ids);
+                            foreach ($missing_ids as $missing_id) {
+                                $progress[] = "Video unavailable: $missing_id";
+                                $errors++;
                             }
 
                             foreach ($data['items'] as $video) {
                                 $video_data[$video['id']] = $video;
                             }
                         } catch (Exception $e) {
-                            $progress[] = "API error for batch " . ($i + $j) . ": " . $e->getMessage();
+                            $progress[] = "API error for batch " . ($i / $batch_size + 1) . ": " . $e->getMessage();
                             $errors += count($batch_ids);
+                            continue;
                         }
                     }
 
@@ -134,20 +144,34 @@ try {
                             ON CONFLICT (video_id, category_id) DO NOTHING
                         ");
 
-                        foreach ($video_data as $video_id => $video) {
-                            if (!isset($category_map[$video_id]) || !in_array($category_map[$video_id], $valid_category_ids)) {
+                        foreach ($video_ids as $video_id) {
+                            if (!isset($video_data[$video_id])) {
                                 $skipped++;
+                                $progress[] = "Skipped video_id: $video_id (missing data)";
                                 continue;
                             }
 
+                            if (!isset($category_map[$video_id])) {
+                                $skipped++;
+                                $progress[] = "Skipped video_id: $video_id (invalid category)";
+                                continue;
+                            }
+
+                            $video = $video_data[$video_id];
                             $title = $video['snippet']['title'];
                             $artist = $video['snippet']['channelTitle'];
                             $thumbnail_link = $video['snippet']['thumbnails']['medium']['url'];
                             $durationISO = $video['contentDetails']['duration'];
 
                             // Convert ISO 8601 duration to seconds
-                            $interval = new DateInterval($durationISO);
-                            $length_seconds = ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
+                            try {
+                                $interval = new DateInterval($durationISO);
+                                $length_seconds = ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
+                            } catch (Exception $e) {
+                                $progress[] = "Invalid duration for video_id: $video_id";
+                                $skipped++;
+                                continue;
+                            }
 
                             $insert_video->execute([
                                 ':video_id' => $video_id,
@@ -166,6 +190,7 @@ try {
                                 $inserted++;
                             } else {
                                 $skipped++;
+                                $progress[] = "Skipped video_id: $video_id (duplicate or insert failed)";
                             }
                         }
 
@@ -223,10 +248,10 @@ try {
             <?php endif; ?>
 
             <?php if (!empty($progress)): ?>
-                <div class="progress">
+                <div class="progress-container">
                     <h3>Processing Progress</h3>
                     <?php foreach ($progress as $log): ?>
-                        <p><?php echo htmlspecialchars($log); ?></p>
+                        <p class="progress-log"><?php echo htmlspecialchars($log); ?></p>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>

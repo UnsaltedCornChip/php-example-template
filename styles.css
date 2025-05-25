@@ -576,20 +576,20 @@ body {
 }
 
 /* Progress styles for bulk_upload.php */
-.progress {
+.progress-container {
     text-align: left;
     max-width: 800px;
     margin: 1rem auto;
     color: var(--content-text);
 }
 
-.progress h3 {
+.progress-container h3 {
     font-size: 1.4rem;
     margin-bottom: 0.5rem;
     color: var(--content-text);
 }
 
-.progress p {
+.progress-log {
     font-size: 1rem;
     margin-bottom: 0.3rem;
     color: var(--content-secondary-text);
