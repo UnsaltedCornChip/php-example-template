@@ -25,6 +25,7 @@
                 <a href="#" class="dropbtn">Admin</a>
                 <div class="dropdown-content">
                     <a href="add_video.php">Add Video</a>
+                    <a href="bulk_upload.php">Bulk Upload</a>
                 </div>
             </li>
             <li>
