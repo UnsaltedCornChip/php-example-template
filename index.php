@@ -35,7 +35,7 @@ session_start();
                     <li><a href="category.php">Search by Category</a></li>
                     <li><a href="all-songs.php">Search All Songs</a></li>
                     <li><a href="artists.php">Search by Artist</a></li>
-                    <li><a href="random.php">Pick 10 Random Songs</a></li>
+                    <li><a href="random.php">Pick 20 Random Songs</a></li>
                 </ul>
             </div>
         </div>
