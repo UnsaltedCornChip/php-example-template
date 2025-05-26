@@ -18,6 +18,23 @@
             <li><a href="newest-additions.php">Newest Additions</a></li>
             <li><a href="artists.php">Artists</a></li>
             <li><a href="random.php">Random</a></li>
+
+            <?php
+                $user = $_SESSION['twitch_user'] ?? null;
+                $isStreamer = $user['is_streamer'] ?? false;
+                $isModerator = $user['is_moderator'] ?? false;
+                $isViewer = $user['is_viewer'] ?? false;
+
+                $role = 'Unknown';
+                if ($isStreamer) {
+                    $role = 'Streamer';
+                } elseif ($isModerator) {
+                    $role = 'Moderator';
+                } elseif ($isViewer) {
+                    $role = 'Viewer';
+                }
+            ?>
+            <?php if ($isStreamer || $isModerator): ?>
             <li class="dropdown">
                 <a href="#" class="dropbtn">Admin</a>
                 <div class="dropdown-content">
@@ -25,25 +42,15 @@
                     <a href="bulk_upload.php">Bulk Upload</a>
                 </div>
             </li>
-            <li>
-                <?php if (isset($_SESSION['twitch_user'])): ?>
-                    <span class="auth-status">
-                        Welcome, <?php echo htmlspecialchars($_SESSION['twitch_user']['login']); ?>
-                        (
-                        <?php
-                            if ($_SESSION['twitch_user']['is_streamer']) {
-                                echo 'Streamer';
-                            } elseif ($_SESSION['twitch_user']['is_moderator']) {
-                                echo 'Moderator';
-                            } elseif ($_SESSION['twitch_user']['is_viewer']) {
-                                echo 'Viewer';
-                            } else {
-                                echo 'Unknown';
-                            }
-                        ?>
-                        )
-                    </span>
-                    <a href="logout.php" class="auth-link">Logout</a>
+            <?php endif; ?>
+            <li class="dropdown">
+                <?php if ($user): ?>
+                    <a href="#" class="dropbtn">
+                        Welcome, <?php echo htmlspecialchars($user['login']); ?> (<?php echo $role; ?>)
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="logout.php">Logout</a>
+                    </div>
                 <?php else: ?>
                     <a href="twitch_login.php" class="auth-link">Login</a>
                 <?php endif; ?>
