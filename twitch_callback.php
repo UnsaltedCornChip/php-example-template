@@ -64,8 +64,8 @@ if (empty($user_data['data'][0]['id'])) {
 $user_id = $user_data['data'][0]['id'];
 $login = $user_data['data'][0]['login'];
 
-// Get unsaltedcornchip's broadcaster ID
-$broadcaster_login = 'unsaltedcornchip';
+// Get thatviolinchick's broadcaster ID
+$broadcaster_login = 'thatviolinchick';
 $broadcaster_url = 'https://api.twitch.tv/helix/users?login=' . urlencode($broadcaster_login);
 $ch = curl_init($broadcaster_url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
