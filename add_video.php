@@ -1,4 +1,5 @@
 <?php
+// Start the session
 session_start();
 
 // Connect to database to fetch categories

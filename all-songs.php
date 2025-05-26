@@ -1,4 +1,7 @@
 <?php
+// Start the session
+session_start();
+
 // Connect to PostgreSQL
 $host = getenv('DB_HOST');
 $db   = getenv('DB_NAME');

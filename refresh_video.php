@@ -1,4 +1,7 @@
 <?php
+// Start the session
+session_start();
+
 $videoId = $_POST['video_id'] ?? '';
 
 if (!$videoId) {

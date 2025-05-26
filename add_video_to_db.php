@@ -1,4 +1,7 @@
 <?php
+// Start the session
+session_start();
+
 $videoId = trim($_POST['video_id'] ?? '');
 $categories = $_POST['categories'] ?? []; // Optional categories array
 

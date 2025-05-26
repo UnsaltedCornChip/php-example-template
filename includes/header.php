@@ -1,6 +1,3 @@
-<?php
-session_start();
-?>
 <header class="titlebar">
     <div class="logo">
         <h1>TVC Twitch Song List</h1>
@@ -36,7 +33,7 @@ session_start();
                     </span>
                     <a href="logout.php" class="auth-link">Logout</a>
                 <?php else: ?>
-                    <a href="twitch_login.php" class="auth-link">Login with Twitch</a>
+                    <a href="twitch_login.php" class="auth-link">Login</a>
                 <?php endif; ?>
             </li>
             <li>
