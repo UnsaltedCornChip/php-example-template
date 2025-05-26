@@ -12,7 +12,7 @@ if (!isset($_GET['state']) || $_GET['state'] !== $_SESSION['twitch_oauth_state']
 }
 unset($_SESSION['twitch_oauth_state']);
 
-// Check for error
+// Check for Twitch OAuth error
 if (isset($_GET['error'])) {
     die('Twitch OAuth error: ' . htmlspecialchars($_GET['error_description']));
 }
@@ -64,7 +64,7 @@ if (empty($user_data['data'][0]['id'])) {
 $user_id = $user_data['data'][0]['id'];
 $login = $user_data['data'][0]['login'];
 
-// Get thatviolinchick's broadcaster ID (hardcoded or fetch dynamically)
+// Get unsaltedcornchip's broadcaster ID
 $broadcaster_login = 'unsaltedcornchip';
 $broadcaster_url = 'https://api.twitch.tv/helix/users?login=' . urlencode($broadcaster_login);
 $ch = curl_init($broadcaster_url);
@@ -79,7 +79,7 @@ $broadcaster_response = curl_exec($ch);
 curl_close($ch);
 
 $broadcaster_data = json_decode($broadcaster_response, true);
-$broadcaster_id = $broadcaster_data['data'][0]['id'] ?? null;
+$broadcaster_id = $broadcaster_data['data'][0]['id'];
 
 if (!$broadcaster_id) {
     die('Failed to retrieve broadcaster ID for thatviolinchick.');
@@ -91,7 +91,7 @@ $is_streamer = ($user_id === $broadcaster_id);
 // Check if user is moderator
 $is_moderator = false;
 if (!$is_streamer) {
-    $mods_url = "https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=$broadcaster_id";
+    $mods_url = "https://api.twitch.tv/helix/moderation/channels?user_id=$user_id";
     $ch = curl_init($mods_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
@@ -104,13 +104,19 @@ if (!$is_streamer) {
     curl_close($ch);
 
     $mods_data = json_decode($mods_response, true);
-    foreach ($mods_data['data'] ?? [] as $mod) {
-        if ($mod['user_id'] === $user_id) {
+    foreach ($mods_data['data'] ?? [] as $channel) {
+        if ($channel['broadcaster_id'] === $broadcaster_id) {
             $is_moderator = true;
             break;
         }
     }
 }
+
+// Debug output
+// echo "<pre>";
+// var_dump($_SESSION);
+// var_dump(get_defined_vars());
+// echo "</pre>";
 
 // Restrict access to streamer or moderators
 if (!$is_streamer && !$is_moderator) {
@@ -126,7 +132,7 @@ $_SESSION['twitch_user'] = [
     'is_moderator' => $is_moderator
 ];
 
-// Redirect to home (e.g., index.php)
+// Redirect to home
 header('Location: index.php');
 exit;
 ?>
