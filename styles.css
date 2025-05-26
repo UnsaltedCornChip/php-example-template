@@ -121,6 +121,23 @@ body {
     color: var(--accent-color);
 }
 
+.auth-status {
+    color: var(--content-secondary-text);
+    font-size: 0.9rem;
+    margin-right: 1rem;
+}
+
+.auth-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: var(--text-color);
+}
+
 .main-content {
     max-width: 1000px;
     margin: 80px auto 2rem;
@@ -663,5 +680,14 @@ body {
 
     .artist-list {
         grid-template-columns: 1fr;
+    }
+
+    .auth-status {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-link {
+        font-size: 0.9rem;
     }
 }

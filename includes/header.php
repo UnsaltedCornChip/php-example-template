@@ -1,5 +1,5 @@
 <?php
-// Header content inspired by tvcsonglist.com
+session_start();
 ?>
 <header class="titlebar">
     <div class="logo">
@@ -27,6 +27,17 @@
                     <a href="add_video.php">Add Video</a>
                     <a href="bulk_upload.php">Bulk Upload</a>
                 </div>
+            </li>
+            <li>
+                <?php if (isset($_SESSION['twitch_user'])): ?>
+                    <span class="auth-status">
+                        Welcome, <?php echo htmlspecialchars($_SESSION['twitch_user']['login']); ?>
+                        (<?php echo $_SESSION['twitch_user']['is_streamer'] ? 'Streamer' : 'Moderator'; ?>)
+                    </span>
+                    <a href="logout.php" class="auth-link">Logout</a>
+                <?php else: ?>
+                    <a href="twitch_login.php" class="auth-link">Login with Twitch</a>
+                <?php endif; ?>
             </li>
             <li>
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
