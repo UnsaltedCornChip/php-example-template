@@ -126,7 +126,7 @@ $_SESSION['twitch_user'] = [
     'is_moderator' => $is_moderator
 ];
 
-// Redirect to admin area (e.g., bulk_upload.php)
-header('Location: bulk_upload.php');
+// Redirect to home (e.g., index.php)
+header('Location: index.php');
 exit;
 ?>
