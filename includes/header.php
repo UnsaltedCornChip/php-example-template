@@ -29,7 +29,19 @@
                 <?php if (isset($_SESSION['twitch_user'])): ?>
                     <span class="auth-status">
                         Welcome, <?php echo htmlspecialchars($_SESSION['twitch_user']['login']); ?>
-                        (<?php echo $_SESSION['twitch_user']['is_streamer'] ? 'Streamer' : 'Moderator'; ?>)
+                        (
+                        <?php
+                            if ($_SESSION['twitch_user']['is_streamer']) {
+                                echo 'Streamer';
+                            } elseif ($_SESSION['twitch_user']['is_moderator']) {
+                                echo 'Moderator';
+                            } elseif ($_SESSION['twitch_user']['is_viewer']) {
+                                echo 'Viewer';
+                            } else {
+                                echo 'Unknown';
+                            }
+                        ?>
+                        )
                     </span>
                     <a href="logout.php" class="auth-link">Logout</a>
                 <?php else: ?>

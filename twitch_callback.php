@@ -91,6 +91,7 @@ $is_streamer = ($user_id === $broadcaster_id);
 
 // Check if user is moderator
 $is_moderator = false;
+$is_viewer = false;
 if (!$is_streamer) {
     $mods_url = "https://api.twitch.tv/helix/moderation/channels?user_id=$user_id";
     $ch = curl_init($mods_url);
@@ -121,7 +122,7 @@ if (!$is_streamer) {
 
 // Restrict access to streamer or moderators
 if (!$is_streamer && !$is_moderator) {
-    die('Access denied: You are not a moderator or the streamer for thatviolinchick.');
+    $is_viewer = true;
 }
 
 // Store user info in session
@@ -130,7 +131,8 @@ $_SESSION['twitch_user'] = [
     'login' => $login,
     'access_token' => $access_token,
     'is_streamer' => $is_streamer,
-    'is_moderator' => $is_moderator
+    'is_moderator' => $is_moderator,
+    'is_viewer' => $is_viewer
 ];
 
 // Redirect to home
