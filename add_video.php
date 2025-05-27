@@ -2,6 +2,14 @@
 // Start the session
 session_start();
 
+// Restrict access to streamer or moderators
+if (!isset($_SESSION['twitch_user']['is_streamer']) || !$_SESSION['twitch_user']['is_streamer']) {
+    if (!isset($_SESSION['twitch_user']['is_moderator']) || !$_SESSION['twitch_user']['is_moderator']) {
+        header('Location: index.php?error=access_denied');
+        exit;
+    }
+}
+
 // Connect to database to fetch categories
 $host = getenv('DB_HOST');
 $db   = getenv('DB_NAME');
