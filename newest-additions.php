@@ -96,10 +96,12 @@ try {
                             <p><?php echo htmlspecialchars($video['artist']); ?></p>
                             <p class="duration"><?php echo $duration; ?></p>
                             <button class="copy-command-btn" data-youtube-link="https://youtu.be/<?php echo htmlspecialchars($video['video_id']); ?>">Copy Song Request Command</button>
-                            <div class="button-container">
-                                <button class="edit-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>">Edit</button>
-                                <button class="refresh-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>"><span class="refresh-icon">↻</span></button>
-                            </div>
+                            <?php if (isset($_SESSION['twitch_user']['is_streamer']) && $_SESSION['twitch_user']['is_streamer'] || isset($_SESSION['twitch_user']['is_moderator']) && $_SESSION['twitch_user']['is_moderator']): ?>
+                                <div class="button-container">
+                                    <button class="edit-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>">Edit</button>
+                                    <button class="refresh-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>"><span class="refresh-icon">↻</span></button>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
