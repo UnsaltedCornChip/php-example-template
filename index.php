@@ -2,6 +2,7 @@
 // Start the session
 session_start();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,9 @@ session_start();
     <?php include 'includes/header.php'; ?>
     
     <main class="main-content">
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'access_denied'): ?>
+            <p class="form-message error-message">Access Denied: You must be a moderator or the streamer to access this page.</p>
+        <?php endif; ?>
         <img src="images/tvc.png" alt="TVC Logo" class="main-image">
         <h2>TVC Stream Song List</h2>
         <p>Here is a page that lists all of the songs that can be requested during a music stream.</p>
