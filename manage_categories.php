@@ -122,31 +122,20 @@ try {
             <?php if (empty($categories)): ?>
                 <p class="no-videos">No categories found.</p>
             <?php else: ?>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Category Name</th>
-                                <th>Video Count</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($categories as $category): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($category['name']); ?></td>
-                                    <td><?php echo $category['youtube_video_count']; ?></td>
-                                    <td>
-                                        <form action="manage_categories.php" method="POST" onsubmit="return confirm('Are you sure you want to delete the category \'<?php echo htmlspecialchars($category['name']); ?>\'? This will remove it from all associated videos.');">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="category_id" value="<?php echo $category['id']; ?>">
-                                            <button type="submit" class="form-button delete-button">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <div class="category-grid">
+                    <?php foreach ($categories as $category): ?>
+                        <div class="category-item">
+                            <div class="category-details">
+                                <p><strong>Name:</strong> <?php echo htmlspecialchars($category['name']); ?></p>
+                                <p><strong>Video Count:</strong> <?php echo $category['youtube_video_count']; ?></p>
+                            </div>
+                            <form action="manage_categories.php" method="POST" onsubmit="return confirm('Are you sure you want to delete the category \'<?php echo htmlspecialchars($category['name']); ?>\'? This will remove it from all associated videos.');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="category_id" value="<?php echo $category['id']; ?>">
+                                <button type="submit" class="form-button delete-button">Delete</button>
+                            </form>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>

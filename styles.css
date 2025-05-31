@@ -307,7 +307,7 @@ body {
     align-items: stretch;
 }
 
-.category-item {
+.categories-container .category-item {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -317,7 +317,7 @@ body {
     line-height: 1.5rem;
 }
 
-.category-item input[type="checkbox"] {
+.categories-container .category-item input[type="checkbox"] {
     margin-right: 0.5rem;
     align-self: center;
     height: 1rem;
@@ -326,7 +326,7 @@ body {
     margin-bottom: 0;
 }
 
-.category-item label {
+.categories-container .category-item label {
     cursor: pointer;
     line-height: 1.5rem;
     flex: 1;
@@ -689,5 +689,67 @@ body {
 
     .auth-link {
         font-size: 0.9rem;
+    }
+}
+
+/* Category grid for manage_categories.php */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.category-item {
+    border: 1px solid var(--content-secondary-text);
+    padding: 0.5rem;
+    border-radius: 4px;
+    background: var(--secondary-bg);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 50px;
+    overflow: visible;
+}
+.category-details {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100px;
+    gap: 0.25rem;
+}
+.category-item p {
+    margin: 0;
+    color: var(--content-text);
+    font-size: 0.9rem;
+    display: block;
+}
+.category-item p strong {
+    color: var(--content-text);
+}
+.category-item .form-button.delete-button {
+    background: #dc3545;
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    margin-left: auto;
+    align-self: center;
+}
+.category-item .form-button.delete-button:hover {
+    background: var(--text-color);
+    color: #dc3545;
+}
+@media (max-width: 768px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .category-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+@media (max-width: 480px) {
+    .category-grid {
+        grid-template-columns: 1fr;
     }
 }
