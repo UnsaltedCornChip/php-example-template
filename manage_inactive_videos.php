@@ -47,12 +47,12 @@ try {
 
     // Fetch inactive videos with categories
     $stmt = $pdo->query("
-        SELECT yv.video_id, yv.title, yv.artist, yv.duration, STRING_AGG(c.name, ', ') as categories
+        SELECT yv.video_id, yv.title, yv.artist, yv.length_seconds, STRING_AGG(c.name, ', ') as categories
         FROM youtube_videos yv
         LEFT JOIN video_categories vc ON yv.video_id = vc.video_id
         LEFT JOIN categories c ON vc.category_id = c.id
         WHERE yv.status = 'inactive'
-        GROUP BY yv.video_id, yv.title, yv.artist, yv.duration
+        GROUP BY yv.video_id, yv.title, yv.artist, yv.length_seconds
         ORDER BY yv.title
     ");
     $videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -92,7 +92,7 @@ try {
                             <div class="video-details">
                                 <h4><?php echo htmlspecialchars($video['title']); ?></h4>
                                 <p><strong>Artist:</strong> <?php echo htmlspecialchars($video['artist'] ?? 'Unknown'); ?></p>
-                                <p><strong>Duration:</strong> <?php echo htmlspecialchars($video['duration'] ?? 'N/A'); ?></p>
+                                <p><strong>Duration:</strong> <?php echo sprintf('%02d:%02d', intdiv($video['length_seconds'], 60), $video['length_seconds'] % 60); ?></p>
                                 <p class="categories"><strong>Categories:</strong> <?php echo htmlspecialchars($video['categories'] ?? 'None'); ?></p>
                             </div>
                             <form action="manage_inactive_videos.php" method="POST" onsubmit="return confirm('Are you sure you want to activate the video \'<?php echo htmlspecialchars($video['title']); ?>\'?');">
