@@ -803,3 +803,22 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Toggle button for category.php */
+.toggle-categories-btn {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 1rem;
+}
+.toggle-categories-btn:hover {
+    background-color: var(--text-color);
+    color: var(--accent-color);
+}

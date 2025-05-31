@@ -27,6 +27,7 @@ try {
     $categories = isset($_GET['categories']) && is_array($_GET['categories']) ? array_map('trim', $_GET['categories']) : [];
     $page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $per_page = isset($_GET['per_page']) && in_array($_GET['per_page'], ['10', '25', '50', '100']) ? (int)$_GET['per_page'] : 25;
+    $hide_categories = isset($_GET['hide_categories']) && $_GET['hide_categories'] == '1';
 
     // Fetch available categories with active videos
     $stmt = $pdo->query("SELECT DISTINCT c.name 
@@ -127,26 +128,31 @@ try {
     <main class="main-content">
         <h2>Category Videos</h2>
         <div class="content-section">
-            <div class="form-container">
-                <form method="GET" action="category.php">
-                    <div class="form-group">
-                        <label>Select Categories:</label>
-                        <div class="categories-container">
-                            <?php if (empty($available_categories)): ?>
-                                <p>No categories available.</p>
-                            <?php else: ?>
-                                <?php foreach ($available_categories as $cat): ?>
-                                    <div class="category-item">
-                                        <input type="checkbox" name="categories[]" value="<?php echo htmlspecialchars($cat); ?>" id="cat-<?php echo htmlspecialchars($cat); ?>" <?php echo in_array($cat, $categories) ? 'checked' : ''; ?>>
-                                        <label for="cat-<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></label>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+            <?php if (!$hide_categories): ?>
+                <div class="form-container">
+                    <form method="GET" action="category.php">
+                        <div class="form-group">
+                            <label>Select Categories:</label>
+                            <div class="categories-container">
+                                <?php if (empty($available_categories)): ?>
+                                    <p>No categories available.</p>
+                                <?php else: ?>
+                                    <?php foreach ($available_categories as $cat): ?>
+                                        <div class="category-item">
+                                            <input type="checkbox" name="categories[]" value="<?php echo htmlspecialchars($cat); ?>" id="cat-<?php echo htmlspecialchars($cat); ?>" <?php echo in_array($cat, $categories) ? 'checked' : ''; ?>>
+                                            <label for="cat-<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" class="form-button">Show Videos</button>
-                </form>
-            </div>
+                        <input type="hidden" name="hide_categories" value="1">
+                        <button type="submit" class="form-button">Show Videos</button>
+                    </form>
+                </div>
+            <?php else: ?>
+                <a href="category.php?<?php echo http_build_query(['categories' => $categories, 'per_page' => $per_page]); ?>" class="toggle-categories-btn">Change Categories</a>
+            <?php endif; ?>
 
             <?php if ($message): ?>
                 <p class="form-message <?php echo $message_type === 'success' ? 'success-message' : 'error-message'; ?>">
@@ -157,58 +163,55 @@ try {
             <?php if (isset($error)): ?>
                 <p class="no-videos"><?php echo htmlspecialchars($error); ?></p>
             <?php elseif (!empty($categories)): ?>
-                <?php if (empty($videos)): ?>
-                    <p class="no-videos">No videos found for selected categories.</p>
-                <?php else: ?>
-                    <form method="GET" action="category.php" class="form-container">
-                        <?php foreach ($categories as $cat): ?>
-                            <input type="hidden" name="categories[]" value="<?php echo htmlspecialchars($cat); ?>">
-                        <?php endforeach; ?>
-                        <div class="form-group">
-                            <label for="per_page">Results per page:</label>
-                            <select id="per_page" name="per_page" onchange="this.form.submit()">
-                                <?php foreach ([10, 25, 50, 100] as $option): ?>
-                                    <option value="<?php echo $option; ?>" <?php echo $per_page == $option ? 'selected' : ''; ?>><?php echo $option; ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                <form method="GET" action="category.php" class="form-container">
+                    <?php foreach ($categories as $cat): ?>
+                        <input type="hidden" name="categories[]" value="<?php echo htmlspecialchars($cat); ?>">
+                    <?php endforeach; ?>
+                    <input type="hidden" name="hide_categories" value="1">
+                    <div class="form-group">
+                        <label for="per_page">Results per page:</label>
+                        <select id="per_page" name="per_page" onchange="this.form.submit()">
+                            <?php foreach ([10, 25, 50, 100] as $option): ?>
+                                <option value="<?php echo $option; ?>" <?php echo $per_page == $option ? 'selected' : ''; ?>><?php echo $option; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </form>
+                <div class="video-list">
+                    <?php foreach ($videos as $video): ?>
+                        <?php
+                        $minutes = floor($video['length_seconds'] / 60);
+                        $seconds = $video['length_seconds'] % 60;
+                        $duration = sprintf("%d:%02d", $minutes, $seconds);
+                        $categories_list = implode(', ', array_map('htmlspecialchars', $video['categories']));
+                        ?>
+                        <div class="video-item">
+                            <img src="<?php echo htmlspecialchars($video['thumbnail_link']); ?>" alt="<?php echo htmlspecialchars($video['title']); ?>">
+                            <h4><a href="https://youtu.be/<?php echo htmlspecialchars($video['video_id']); ?>" target="_blank"><?php echo htmlspecialchars($video['title']); ?></a></h4>
+                            <p><?php echo htmlspecialchars($video['artist']); ?></p>
+                            <p class="categories">Categories: <?php echo $categories_list ?: 'None'; ?></p>
+                            <p class="duration"><?php echo $duration; ?></p>
+                            <button class="copy-command-btn" data-youtube-link="https://youtu.be/<?php echo htmlspecialchars($video['video_id']); ?>">Copy Song Request Command</button>
+                            <?php if (isset($_SESSION['twitch_user']['is_streamer']) && $_SESSION['twitch_user']['is_streamer'] || isset($_SESSION['twitch_user']['is_moderator']) && $_SESSION['twitch_user']['is_moderator']): ?>
+                                <div class="button-container">
+                                    <button class="edit-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>">Edit</button>
+                                    <button class="refresh-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>"><span class="refresh-icon">↻</span></button>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    </form>
-                    <div class="video-list">
-                        <?php foreach ($videos as $video): ?>
-                            <?php
-                            $minutes = floor($video['length_seconds'] / 60);
-                            $seconds = $video['length_seconds'] % 60;
-                            $duration = sprintf("%d:%02d", $minutes, $seconds);
-                            $categories_list = implode(', ', array_map('htmlspecialchars', $video['categories']));
-                            ?>
-                            <div class="video-item">
-                                <img src="<?php echo htmlspecialchars($video['thumbnail_link']); ?>" alt="<?php echo htmlspecialchars($video['title']); ?>">
-                                <h4><a href="https://youtu.be/<?php echo htmlspecialchars($video['video_id']); ?>" target="_blank"><?php echo htmlspecialchars($video['title']); ?></a></h4>
-                                <p><?php echo htmlspecialchars($video['artist']); ?></p>
-                                <p class="categories">Categories: <?php echo $categories_list ?: 'None'; ?></p>
-                                <p class="duration"><?php echo $duration; ?></p>
-                                <button class="copy-command-btn" data-youtube-link="https://youtu.be/<?php echo htmlspecialchars($video['video_id']); ?>">Copy Song Request Command</button>
-                                <?php if (isset($_SESSION['twitch_user']['is_streamer']) && $_SESSION['twitch_user']['is_streamer'] || isset($_SESSION['twitch_user']['is_moderator']) && $_SESSION['twitch_user']['is_moderator']): ?>
-                                    <div class="button-container">
-                                        <button class="edit-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>">Edit</button>
-                                        <button class="refresh-btn" data-video-id="<?php echo htmlspecialchars($video['video_id']); ?>"><span class="refresh-icon">↻</span></button>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="pagination">
-                        <?php if ($page > 1): ?>
-                            <a href="category.php?<?php echo http_build_query(array_merge(['categories' => $categories, 'per_page' => $per_page, 'page' => $page - 1])); ?>" class="pagination-link">Previous</a>
-                        <?php endif; ?>
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                            <a href="category.php?<?php echo http_build_query(array_merge(['categories' => $categories, 'per_page' => $per_page, 'page' => $i])); ?>" class="pagination-link <?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                        <?php endfor; ?>
-                        <?php if ($page < $total_pages): ?>
-                            <a href="category.php?<?php echo http_build_query(array_merge(['categories' => $categories, 'per_page' => $per_page, 'page' => $page + 1])); ?>" class="pagination-link">Next</a>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+                <div class="pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="category.php?<?php echo http_build_query(array_merge(['categories' => $categories, 'per_page' => $per_page, 'page' => $page - 1, 'hide_categories' => 1])); ?>" class="pagination-link">Previous</a>
+                    <?php endif; ?>
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="category.php?<?php echo http_build_query(array_merge(['categories' => $categories, 'per_page' => $per_page, 'page' => $i, 'hide_categories' => 1])); ?>" class="pagination-link <?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                    <?php endfor; ?>
+                    <?php if ($page < $total_pages): ?>
+                        <a href="category.php?<?php echo http_build_query(array_merge(['categories' => $categories, 'per_page' => $per_page, 'page' => $page + 1, 'hide_categories' => 1])); ?>" class="pagination-link">Next</a>
+                    <?php endif; ?>
+                </div>
             <?php else: ?>
                 <p class="no-videos">Select categories to view videos.</p>
             <?php endif; ?>
