@@ -35,7 +35,7 @@ try {
     $params = [];
     
     if ($search) {
-        $query .= " AND (LOWER(title) LIKE LOWER(:search) OR LOWER(artist) LIKE LOWER(:search))";
+        $query .= " AND (LOWER(title) LIKE LOWER(:search) OR LOWER(artist) LIKE LOWER(:search) OR LOWER(video_id) LIKE LOWER(:search))";
         $params[':search'] = '%' . $search . '%';
     }
     
@@ -102,8 +102,8 @@ try {
         <div class="content-section">
             <form method="GET" action="all-songs.php" class="form-container">
                 <div class="form-group">
-                    <label for="search">Search by Title or Artist:</label>
-                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Enter title or artist">
+                    <label for="search">Search by Title, Artist, or Video ID:</label>
+                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Enter title, artist, or video ID">
                 </div>
                 <div class="form-group">
                     <label for="per_page">Results per page:</label>
