@@ -41,6 +41,7 @@
                     <a href="add_video.php">Add Video</a>
                     <a href="bulk_upload.php">Bulk Upload</a>
                     <a href="manage_categories.php">Categories</a>
+                    <a href="import_playlist.php">Import Playlist</a>
                     <a href="manage_inactive_videos.php">Inactive Videos</a>
                 </div>
             </li>
