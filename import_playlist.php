@@ -64,12 +64,12 @@ try {
                     $progress_logs[] = "Fetched playlist: $playlist_name";
 
                     // Check if category exists or create new
-                    $stmt = $pdo->prepare("SELECT id FROM categories WHERE name = ?");
+                    $stmt = $pdo->prepare('SELECT id FROM categories WHERE "name" = ?');
                     $stmt->execute([$playlist_name]);
                     $category_id = $stmt->fetchColumn();
 
                     if (!$category_id) {
-                        $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (?) RETURNING id");
+                        $stmt = $pdo->prepare('INSERT INTO categories ("name") VALUES (?) RETURNING id');
                         $stmt->execute([$playlist_name]);
                         $category_id = $stmt->fetchColumn();
                         $progress_logs[] = "Created new category: $playlist_name";
@@ -136,32 +136,46 @@ try {
                             $interval = new DateInterval($duration_iso);
                             $seconds = ($interval->d * 86400) + ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
 
-                            // Check if video exists
-                            $stmt = $pdo->prepare("SELECT video_id FROM youtube_videos WHERE video_id = ?");
-                            $stmt->execute([$video_id]);
-                            if ($stmt->fetchColumn()) {
-                                $progress_logs[] = "Skipped video $video_id: Already exists ($title).";
+                            // Skip if thumbnail is empty
+                            if (empty($thumbnail)) {
+                                $progress_logs[] = "Skipped video $video_id: No medium thumbnail ($title).";
                                 $skipped++;
                                 continue;
                             }
 
-                            // Insert video
-                            $stmt = $pdo->prepare("
-                                INSERT INTO youtube_videos (video_id, title, artist, thumbnail_link, duration_seconds, created_at, status)
-                                VALUES (?, ?, ?, ?, ?, NOW(), 'active')
-                            ");
-                            $stmt->execute([$video_id, $title, $artist, $thumbnail, $seconds]);
+                            // Check if video exists
+                            $stmt = $pdo->prepare("SELECT video_id FROM youtube_videos WHERE video_id = ?");
+                            $stmt->execute([$video_id]);
+                            $is_existing = $stmt->fetchColumn();
 
-                            // Link to category
-                            $stmt = $pdo->prepare("INSERT INTO video_categories (video_id, category_id) VALUES (?, ?)");
+                            if ($is_existing) {
+                                $progress_logs[] = "Video $video_id already exists ($title). Assigning category.";
+                            } else {
+                                // Insert video
+                                $stmt = $pdo->prepare("
+                                    INSERT INTO youtube_videos (video_id, title, artist, thumbnail_link, length_seconds, created_at, status)
+                                    VALUES (?, ?, ?, ?, ?, NOW(), 'active')
+                                ");
+                                $stmt->execute([$video_id, $title, $artist, $thumbnail, $seconds]);
+                                $progress_logs[] = "Imported video $video_id: $title";
+                                $imported++;
+                            }
+
+                            // Link to category (for both new and existing videos)
+                            $stmt = $pdo->prepare("
+                                INSERT INTO video_categories (video_id, category_id)
+                                VALUES (?, ?)
+                                ON CONFLICT (video_id, category_id) DO NOTHING
+                            ");
                             $stmt->execute([$video_id, $category_id]);
 
-                            $progress_logs[] = "Imported video $video_id: $title";
-                            $imported++;
+                            if ($is_existing) {
+                                $skipped++;
+                            }
                         }
                     }
 
-                    $message = "Imported $imported videos. Skipped $skipped duplicates.";
+                    $message = "Imported $imported new videos. Processed $skipped existing videos.";
                     $message_type = 'success';
                 } catch (Exception $e) {
                     $message = 'Error: ' . htmlspecialchars($e->getMessage());
